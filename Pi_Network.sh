@@ -222,8 +222,10 @@ show_results() {
 show_menu() {
     echo -e "${YELLOW}=== Pi Network 管理脚本 ===${NC}"
     echo -e "${GREEN}1.${NC} 安装 SoftEther VPN + FRPS"
-    echo -e "${GREEN}2.${NC} 卸载 SoftEther VPN + FRPS"
-    echo -e "${GREEN}3.${NC} 退出"
+    echo -e "${GREEN}2.${NC} 仅安装 SoftEther VPN"
+    echo -e "${GREEN}3.${NC} 仅安装 FRPS"
+    echo -e "${GREEN}4.${NC} 卸载 SoftEther VPN + FRPS"
+    echo -e "${GREEN}5.${NC} 退出"
     echo -e "${YELLOW}===========================${NC}"
 }
 
@@ -251,7 +253,7 @@ main() {
     
     while true; do
         show_menu
-        read -p "请选择操作 [1-3]: " choice
+        read -p "请选择操作 [1-5]: " choice
         
         case $choice in
             1)
@@ -264,10 +266,25 @@ main() {
                 break
                 ;;
             2)
-                uninstall_all
+                install_softether
+                add_cron_job
+                cleanup
+                show_results
                 break
                 ;;
             3)
+                uninstall_frps
+                install_frps
+                add_cron_job
+                cleanup
+                show_results
+                break
+                ;;
+            4)
+                uninstall_all
+                break
+                ;;
+            5)
                 echo -e "${GREEN}退出脚本${NC}"
                 exit 0
                 ;;
