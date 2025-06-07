@@ -230,7 +230,7 @@ uninstall() {
     systemctl daemon-reload > /dev/null 2>&1
     
     # 终止可能仍在运行的占用80端口的python3进程
-    PID=$(lsof -i :80 | grep python3 | awk '{print $2}')
+    PID=$(lsof -i :80 | grep python3 | awk '{print $2}') > /dev/null 2>&1
     if [ -n "$PID" ]; then
         kill $PID > /dev/null 2>&1
         sleep 1
