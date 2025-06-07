@@ -386,12 +386,8 @@ main_menu() {
                 green "OpenVPN + FRP 安装完成！"
                 yellow "OpenVPN 端口: $DEFAULT_PORT"
                 yellow "OpenVPN 协议: $DEFAULT_PROTOCOL"
-                red "FRP TCP端口: $FRPS_PORT"
-                red "FRP UDP端口: $FRPS_UDP_PORT"
-                red "FRP KCP端口: $FRPS_KCP_PORT"
-                red "FRP 密码: $FRPS_TOKEN"
                 echo ""
-                green "======================================================================================"
+                green "====================================================================================="
                 echo ""
                 generate_download_link
                 exit 0
