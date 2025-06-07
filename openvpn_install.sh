@@ -229,17 +229,19 @@ uninstall() {
     rm -rf /etc/openvpn > /dev/null 2>&1
     systemctl daemon-reload > /dev/null 2>&1
     
-    # 终止可能仍在运行的占用80端口的python3进程
-    PID=$(lsof -i :80 | grep python3 | awk '{print $2}') > /dev/null 2>&1
-    if [ -n "$PID" ]; then
-        kill $PID > /dev/null 2>&1
-        sleep 1
-        if ps -p $PID > /dev/null 2>&1; then
-            kill -9 $PID > /dev/null 2>&1
+    # 确保释放所有相关端口
+    for port in $DEFAULT_PORT $FRPS_PORT $FRPS_UDP_PORT $FRPS_KCP_PORT 80; do
+        # 查找占用该端口的进程ID并终止
+        local pid=$(lsof -t -i :$port)
+        if [ -n "$pid" ]; then
+            kill $pid > /dev/null 2>&1
+            # 再次检查是否已终止，如果仍在运行，则强制终止
+            sleep 1
+            if ps -p $pid > /dev/null 2>&1; then
+                kill -9 $pid > /dev/null 2>&1
+            fi
         fi
-    fi
-    
-    green "OpenVPN 已成功卸载"
+    done
 }
 
 # 修改端口
