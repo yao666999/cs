@@ -279,18 +279,15 @@ generate_download_link() {
     fi
 }
 
-# 卸载旧版FRPS
 uninstall_frps() {
-    yellow "卸载旧版FRPS服务..."
+    yellow "已卸载FRP服务..."
     systemctl stop frps >/dev/null 2>&1
     systemctl disable frps >/dev/null 2>&1
     rm -f /etc/systemd/system/frps.service > /dev/null 2>&1
     rm -rf /usr/local/frp /etc/frp > /dev/null 2>&1
     systemctl daemon-reload >/dev/null 2>&1
-    green "旧版FRPS服务已成功卸载"
 }
 
-# 安装FRPS
 install_frps() {
     yellow "安装FRPS服务..."
     uninstall_frps
@@ -351,10 +348,9 @@ show_frps_info() {
     systemctl is-active frps
     yellow ">>> FRPS信息："
     echo "服务器地址: $(curl -s ifconfig.me || hostname -I | awk '{print $1}')"
-    red "FRPS 密码: $FRPS_TOKEN"
     red "TCP端口: $FRPS_PORT"
-    red "UDP端口: $FRPS_UDP_PORT"
-    red "KCP端口: $FRPS_KCP_PORT\n"
+    red "FRPS 密码: $FRPS_TOKEN"
+
 }
 
 # 主菜单
