@@ -382,10 +382,6 @@ main_menu() {
                 setup_port_forwarding
                 start_service
                 install_frps
-                green "======================================================================================"
-                green "OpenVPN + FRP 安装完成！"
-                yellow "OpenVPN 端口: $DEFAULT_PORT"
-                yellow "OpenVPN 协议: $DEFAULT_PROTOCOL"
                 echo ""
                 green "====================================================================================="
                 echo ""
