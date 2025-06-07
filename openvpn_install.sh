@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# 颜色定义
 RED="\033[31m"
 GREEN="\033[32m\033[01m"
 YELLOW="\033[33m\033[01m"
@@ -10,13 +8,11 @@ red(){ echo -e "\033[31m\033[01m$1\033[0m" >&2; }
 green(){ echo -e "\033[32m\033[01m$1\033[0m"; }
 yellow(){ echo -e "\033[33m\033[01m$1\033[0m"; }
 
-# 错误处理函数
 error_exit() {
     red "错误：$1"
     exit 1
 }
 
-# 默认配置
 DEFAULT_PORT=7005
 DEFAULT_PROTOCOL="udp"
 SERVER_IP=$(curl -s ifconfig.me)
@@ -24,35 +20,28 @@ CONFIG_DIR="/etc/openvpn"
 SERVER_CONFIG="$CONFIG_DIR/server.conf"
 CLIENT_CONFIG="$CONFIG_DIR/client.ovpn"
 SILENT_MODE=false
-
-# FRP配置
 FRP_VERSION="v0.44.0"
 FRPS_PORT="7000"
 FRPS_UDP_PORT="7001"
 FRPS_KCP_PORT="7002"
 FRPS_TOKEN="DFRN2vbG123"
-
-# 检查是否为 root 用户
 if [ "$EUID" -ne 0 ]; then
     red "请使用 root 权限运行此脚本"
     exit 1
 fi
 
-# 静默输出函数 (已弃用，直接使用颜色函数或 echo)
 # log() {
 #     if [ "$SILENT_MODE" = false ]; then
 #         echo -e "$1"
 #     fi
 # }
 
-# 安装依赖
 install_dependencies() {
     yellow "正在安装依赖..."
     apt-get update > /dev/null 2>&1 || error_exit "apt-get update 失败"
     DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn easy-rsa openssl curl wget python3 > /dev/null 2>&1 || error_exit "依赖安装失败"
 }
 
-# 生成证书
 generate_certificates() {
     yellow "正在生成证书..."
     mkdir -p /etc/openvpn/easy-rsa/ > /dev/null 2>&1 || error_exit "无法创建 easy-rsa 目录"
@@ -71,7 +60,6 @@ generate_certificates() {
     cp /etc/openvpn/easy-rsa/pki/dh.pem /etc/openvpn/ > /dev/null 2>&1 || error_exit "复制 dh.pem 失败"
 }
 
-# 创建服务器配置
 create_server_config() {
     yellow "正在创建服务器配置..."
     cat > $SERVER_CONFIG << EOF || error_exit "创建服务器配置文件失败"
@@ -103,7 +91,6 @@ verb 1
 EOF
 }
 
-# 创建客户端配置
 create_client_config() {
     yellow "正在创建客户端配置..."
     cat > $CLIENT_CONFIG << EOF || error_exit "创建客户端配置文件失败"
@@ -137,7 +124,6 @@ key-direction 1
 EOF
 }
 
-# 设置端口转发
 setup_port_forwarding() {
     echo 1 > /proc/sys/net/ipv4/ip_forward
     sysctl -w net.ipv4.ip_forward=1 > /dev/null 2>&1
@@ -187,13 +173,11 @@ EOF
     systemctl enable iptables > /dev/null 2>&1 || error_exit "启用iptables服务失败"
 }
 
-# 启动服务
 start_service() {
     yellow "正在启动 OpenVPN 服务..."
     systemctl enable openvpn@server > /dev/null 2>&1 || error_exit "启用 OpenVPN 服务失败"
     systemctl start openvpn@server > /dev/null 2>&1 || error_exit "启动 OpenVPN 服务失败"
     
-    # 创建OpenVPN自启动服务
     if [[ ! -f /etc/systemd/system/openvpn-autostart.service ]]; then
         cat > /etc/systemd/system/openvpn-autostart.service << EOF || error_exit "创建 OpenVPN 自启动服务文件失败"
 [Unit]
@@ -213,7 +197,6 @@ EOF
     fi
 }
 
-# 卸载功能
 uninstall() {
     yellow "已卸载 OpenVPN..."
     systemctl stop openvpn@server > /dev/null 2>&1
@@ -228,7 +211,6 @@ uninstall() {
     rm -rf /etc/openvpn > /dev/null 2>&1
     systemctl daemon-reload > /dev/null 2>&1
     
-    # 确保释放所有相关端口
     for port in $DEFAULT_PORT $FRPS_PORT $FRPS_UDP_PORT $FRPS_KCP_PORT 80; do
         # 查找占用该端口的进程ID并终止
         local pid=$(lsof -t -i :$port)
@@ -243,7 +225,6 @@ uninstall() {
     done
 }
 
-# 修改端口
 change_port() {
     local new_port=$1
     yellow "正在修改端口为 $new_port..."
@@ -253,7 +234,6 @@ change_port() {
     green "端口已成功修改为 $new_port"
 }
 
-# 生成下载链接
 generate_download_link() {
     local config_path="$CONFIG_DIR/client.ovpn"
     if [ -f "$config_path" ]; then
@@ -342,7 +322,6 @@ install_frps() {
     show_frps_info
 }
 
-# 显示FRPS信息
 show_frps_info() {
     yellow ">>> FRPS服务状态："
     systemctl is-active frps
@@ -353,7 +332,6 @@ show_frps_info() {
 
 }
 
-# 主菜单
 main_menu() {
     while true; do
         green "\n请选择操作："
