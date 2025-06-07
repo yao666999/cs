@@ -139,7 +139,6 @@ EOF
 
 # 设置端口转发
 setup_port_forwarding() {
-    yellow "正在设置端口转发..."
     echo 1 > /proc/sys/net/ipv4/ip_forward
     sysctl -w net.ipv4.ip_forward=1 > /dev/null 2>&1
     
@@ -216,7 +215,7 @@ EOF
 
 # 卸载功能
 uninstall() {
-    yellow "正在卸载 OpenVPN..."
+    yellow "已卸载 OpenVPN..."
     systemctl stop openvpn@server > /dev/null 2>&1
     systemctl disable openvpn@server > /dev/null 2>&1
     systemctl disable openvpn-autostart > /dev/null 2>&1
@@ -256,14 +255,13 @@ change_port() {
 
 # 生成下载链接
 generate_download_link() {
-    yellow "正在生成客户端下载链接..."
     local config_path="$CONFIG_DIR/client.ovpn"
     if [ -f "$config_path" ]; then
         if lsof -i :80 > /dev/null 2>&1; then
             red "错误：80 端口已被占用，请先关闭占用该端口的服务"
             exit 1
         fi
-        green "客户端配置文件下载链接："
+        green "openvpn客户端配置文件下载链接："
         red "http://$SERVER_IP/client.ovpn"
         echo ""
         # 确保下载目录存在
@@ -368,8 +366,7 @@ main_menu() {
         echo "3) 修改端口"
         echo "4) 生成客户端下载链接"
         echo "5) 卸载 FRP"
-        echo "6) 显示 FRP 信息"
-        echo "7) 退出"
+        echo "6) 退出"
         read -t 30 -p "请输入数字 [1-7]: " choice
         if [ -z "$choice" ]; then
             yellow "未输入选项，请重新输入"
@@ -405,9 +402,6 @@ main_menu() {
                 uninstall_frps
                 ;;
             6)
-                show_frps_info
-                ;;
-            7)
                 yellow "已退出"
                 exit 0
                 ;;
